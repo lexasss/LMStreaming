@@ -29,10 +29,7 @@ public class StreamingService
 
         _dispatcher.Invoke(() =>
         {
-            if (e.IsEmpty)
-                _tcpServer.Send("0 0 0");
-            else
-                _tcpServer.Send($"{e.Palm.x:F4} {e.Palm.y:F4} {e.Palm.z:F4}");
+            _tcpServer.Send(e.AsJson());
         });
     }
 }
