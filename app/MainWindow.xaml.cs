@@ -1,0 +1,46 @@
+﻿using System.ComponentModel;
+using System.Windows;
+
+namespace LMStreaming;
+
+public partial class MainWindow : Window, INotifyPropertyChanged
+{
+    public MainViewModel ViewModel
+    {
+        get => field;
+        private set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ViewModel)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        var app = (App)Application.Current;
+
+        ViewModel = new MainViewModel(
+            app.HandTrackingService,
+            app.TcpServer,
+            Dispatcher);
+
+        Commands.MainViewCommand[] commands = [
+            new Commands.ToggleHandTracker(ViewModel),
+        ];
+
+        foreach (var command in commands)
+        {
+            CommandBindings.Add(command.Binding);
+            if (command.KeyBinding != null)
+            {
+                InputBindings.Add(command.KeyBinding);
+            }
+        }
+
+        app.TcpServer.Start();
+    }
+}
