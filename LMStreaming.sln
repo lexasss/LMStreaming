@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMStreaming", "app\LMStreaming.csproj", "{9CE641D3-EC72-46FB-93CF-ED4F9FAEC6F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMStreamer", "app\LMStreamer.csproj", "{9CE641D3-EC72-46FB-93CF-ED4F9FAEC6F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeapMotion.Net", "LeapMotion.Net\LeapMotion.Net.csproj", "{25BFD832-7845-2F18-D7E9-21E03D82A45F}"
 EndProject
