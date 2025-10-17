@@ -11,9 +11,9 @@
         DataContext="{Binding Path=ViewModel, RelativeSource={RelativeSource Self}}"
         Style="{StaticResource MaterialDesignWindow}"
         Title="Leap Motion Streamer"
-        Height="300"
+        Height="320"
         Width="650"
-        MinHeight="300"
+        MinHeight="320"
         MinWidth="650"
         Icon="/assets/images/logo.png">
 
@@ -36,7 +36,7 @@
             <WrapPanel>
                 <Label VerticalAlignment="Center"
                        Margin="0,0,12,0"
-                       Content="Hand tracker"/>
+                       Content="Device"/>
                 <ComboBox Grid.Column="0"
                           Width="120"
                           Margin="4"
@@ -55,7 +55,8 @@
                        VerticalAlignment="Center"
                        IsEnabled="{Binding HasSelectedHandTracker, Mode=OneWay}"/>
                 <TextBox HorizontalAlignment="Right"
-                         Width="60"
+                         HorizontalContentAlignment="Center"
+                         Width="44"
                          Margin="4"
                          IsEnabled="{Binding HasSelectedHandTracker, Mode=OneWay}">
                     <TextBox.Text>
