@@ -124,6 +124,8 @@ public class HandTrackingService : IDisposable
 
         if (-1 < handIndex && handIndex < e.frame.Hands.Count)
         {
+            handDetected = true;
+
             var fingers = e.frame.Hands[handIndex].Fingers;
 
             // convert mm to cm
@@ -132,11 +134,7 @@ public class HandTrackingService : IDisposable
             var index = fingers[1].TipPosition / 10;
             var middle = fingers[2].TipPosition / 10;
 
-            if (Math.Sqrt(palm.x * palm.x + palm.y * palm.y + palm.z * palm.z) < MaxTrackingDistance)
-            {
-                handDetected = true;
-                HandData?.Invoke(this, new HandLocation(Vector.From(in palm), Vector.From(in thumb), Vector.From(in index), Vector.From(in middle)));
-            }
+            HandData?.Invoke(this, new HandLocation(Vector.From(in palm), Vector.From(in thumb), Vector.From(in index), Vector.From(in middle)));
         }
 
         if (!handDetected)

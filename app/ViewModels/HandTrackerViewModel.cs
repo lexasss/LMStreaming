@@ -132,7 +132,7 @@ public class HandTrackerViewModel : INotifyPropertyChanged
 
     // Internal
 
-    const int DATA_SKIP_RATE = 20;
+    const int DATA_SKIP_RATE = 10;
 
     readonly HandTrackingService _handTrackingService;
     readonly Dispatcher _dispatcher;
@@ -220,7 +220,7 @@ public class HandTrackerViewModel : INotifyPropertyChanged
         if (!_handTrackingService.IsTracking)
             return;
 
-        if ((_dataIndex++ % DATA_SKIP_RATE) == 0)
+        if ((_dataIndex++ % DATA_SKIP_RATE) != 0)
             return;
 
         _dispatcher.Invoke(() =>
