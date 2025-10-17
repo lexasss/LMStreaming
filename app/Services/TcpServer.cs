@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class TcpServer : IDisposable
 {
@@ -26,13 +26,15 @@ public class TcpServer : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public async void Send(string data)
+    public bool Send(string data)
     {
         if (_connection != null)
         {
             var bytes = Encoding.ASCII.GetBytes(data + "\n");
-            await _connection.SendAsync(bytes);
+            return _connection.Send(bytes) > 0;
         }
+
+        return false;
     }
 
     public async void Start()

@@ -1,6 +1,6 @@
 ﻿using Leap;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class HandTrackingService : IDisposable
 {
@@ -13,7 +13,15 @@ public class HandTrackingService : IDisposable
     /// <summary>
     /// Maximum distance for the hand to be tracked, in cm
     /// </summary>
-    public double MaxHandTrackingDistance { get; set; } = 50;
+    public double MaxTrackingDistance
+    {
+        get => Properties.Settings.Default.MaxTrackingDistance;
+        set
+        {
+            Properties.Settings.Default.MaxTrackingDistance = value;
+            Properties.Settings.Default.Save();
+        }
+    }
 
     public event EventHandler<Device>? DeviceAdded;
     public event EventHandler<Device>? DeviceRemoved;
@@ -94,14 +102,27 @@ public class HandTrackingService : IDisposable
     {
         bool handDetected = false;
 
-        int handIndex = 0;
+        int handIndex = -1;
 
-        while (handIndex < e.frame.Hands.Count && e.frame.Hands[handIndex].IsLeft) // accept only right hand
+        /*while (handIndex < e.frame.Hands.Count && e.frame.Hands[handIndex].IsLeft) // accept only right hand !! works badly for the top-view setup, thus rejected
         {
             handIndex++;
+        }*/
+
+        // find the closest hand
+        double minDistance = double.MaxValue;
+        for (int i = 0; i < e.frame.Hands.Count; i++)
+        {
+            var palm = e.frame.Hands[i].PalmPosition / 10;
+            var distance = Math.Sqrt(palm.x * palm.x + palm.y * palm.y + palm.z * palm.z);
+            if (distance < minDistance && distance < MaxTrackingDistance)
+            {
+                minDistance = distance;
+                handIndex = i;
+            }
         }
 
-        if (handIndex < e.frame.Hands.Count)
+        if (-1 < handIndex && handIndex < e.frame.Hands.Count)
         {
             var fingers = e.frame.Hands[handIndex].Fingers;
 
@@ -111,7 +132,7 @@ public class HandTrackingService : IDisposable
             var index = fingers[1].TipPosition / 10;
             var middle = fingers[2].TipPosition / 10;
 
-            if (Math.Sqrt(palm.x * palm.x + palm.y * palm.y + palm.z * palm.z) < MaxHandTrackingDistance)
+            if (Math.Sqrt(palm.x * palm.x + palm.y * palm.y + palm.z * palm.z) < MaxTrackingDistance)
             {
                 handDetected = true;
                 HandData?.Invoke(this, new HandLocation(Vector.From(in palm), Vector.From(in thumb), Vector.From(in index), Vector.From(in middle)));

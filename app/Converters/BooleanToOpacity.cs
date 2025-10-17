@@ -1,22 +1,21 @@
 ﻿using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace LMStreamer.Converters;
 
-internal class BooleanToVisible : IValueConverter
+internal class BooleanToOpacity : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var isTrue = (bool)value;
-        if (parameter != null)
-            isTrue = !isTrue;
-        return isTrue ? Visibility.Visible : Visibility.Collapsed;
+        var opacity = isTrue ? 1.0 : 0.5;
+        if (!isTrue && parameter is double opacityIfFalse)
+            opacity = opacityIfFalse;
+        return opacity;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var visibility = (Visibility)value;
-        return visibility == Visibility.Visible;
+        return (double)value == 1.0;
     }
 }

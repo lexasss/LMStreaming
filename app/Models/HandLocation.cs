@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class Vector(double x, double y, double z)
 {

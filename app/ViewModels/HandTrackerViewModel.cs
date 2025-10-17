@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Threading;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class HandTrackerViewModel : INotifyPropertyChanged
 {
@@ -37,12 +37,14 @@ public class HandTrackerViewModel : INotifyPropertyChanged
             field = value;
             if (value)
             {
+                _dataIndex = 0;
                 _handTrackingService.IsTracking = true;
                 StartHandTracking();
             }
             else
             {
                 StopHandTracking();
+                HandLocation = HandLocation.Empty;
             }
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsHandTrackingRunning)));
@@ -83,6 +85,26 @@ public class HandTrackerViewModel : INotifyPropertyChanged
 
     public ObservableCollection<LeapMotionDevice> HandTrackers { get; } = [];
 
+    public HandLocation HandLocation
+    {
+        get => field;
+        private set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HandLocation)));
+        }
+    } = HandLocation.Empty;
+
+    public double MaxTrackingDistance
+    {
+        get => _handTrackingService.MaxTrackingDistance;
+        set
+        {
+            _handTrackingService.MaxTrackingDistance = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaxTrackingDistance)));
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public HandTrackerViewModel(HandTrackingService handTrackingService, Dispatcher dispatcher)
@@ -104,12 +126,18 @@ public class HandTrackerViewModel : INotifyPropertyChanged
         HasHandTrackers = _handTrackingService.Devices.Count > 0;
 
         EnsureSomeHandTrackerIsSelected();
+
+        _handTrackingService.HandData += HandTracker_HandData;
     }
 
     // Internal
 
+    const int DATA_SKIP_RATE = 20;
+
     readonly HandTrackingService _handTrackingService;
     readonly Dispatcher _dispatcher;
+
+    int _dataIndex = 0;
 
     private void EnsureSomeHandTrackerIsSelected()
     {
@@ -185,5 +213,19 @@ public class HandTrackerViewModel : INotifyPropertyChanged
     private void HandTracker_ConnectionStatusChanged(object? sender, bool e)
     {
         IsHandTrackerConnected = e;
+    }
+
+    private void HandTracker_HandData(object? sender, HandLocation e)
+    {
+        if (!_handTrackingService.IsTracking)
+            return;
+
+        if ((_dataIndex++ % DATA_SKIP_RATE) == 0)
+            return;
+
+        _dispatcher.Invoke(() =>
+        {
+            HandLocation = e;
+        });
     }
 }

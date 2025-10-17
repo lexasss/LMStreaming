@@ -1,21 +1,23 @@
-﻿using System.Windows.Threading;
+﻿using System.Windows;
+using System.Windows.Threading;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class MainViewModel
 {
     public HandTrackerViewModel HandTracker { get; }
     public TcpServerViewModel TcpServer { get; }
+    public StreamerViewModel Streamer { get; }
 
-    public MainViewModel(
-        HandTrackingService handTrackingService,
-        TcpServer tcpServer,
-        Dispatcher dispatcher)
+    public MainViewModel(Dispatcher dispatcher)
     {
-        HandTracker = new(handTrackingService, dispatcher);
-        TcpServer = new(tcpServer, dispatcher);
+        var app = (App)Application.Current;
 
-        tcpServer.Data += TcpServer_Data;
+        HandTracker = new(app.HandTrackingService, dispatcher);
+        TcpServer = new(app.TcpServer, dispatcher);
+        Streamer = new(app.StreamingService);
+
+        app.TcpServer.Data += TcpServer_Data;
     }
 
     // Internal

@@ -1,4 +1,4 @@
-﻿namespace LMStreaming;
+﻿namespace LMStreamer;
 
 public class LeapMotionDevice(Leap.Device device)
 {

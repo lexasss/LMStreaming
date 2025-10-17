@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
@@ -23,10 +23,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         var app = (App)Application.Current;
 
-        ViewModel = new MainViewModel(
-            app.HandTrackingService,
-            app.TcpServer,
-            Dispatcher);
+        ViewModel = new MainViewModel(Dispatcher);
 
         Commands.MainViewCommand[] commands = [
             new Commands.ToggleHandTracker(ViewModel),

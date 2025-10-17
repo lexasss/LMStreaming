@@ -3,7 +3,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class TcpServerViewModel : INotifyPropertyChanged
 {

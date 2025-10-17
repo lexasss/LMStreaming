@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace LMStreaming.Commands;
+namespace LMStreamer.Commands;
 
 internal class ToggleHandTracker : MainViewCommand
 {

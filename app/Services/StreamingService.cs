@@ -1,9 +1,11 @@
 ﻿using System.Windows.Threading;
 
-namespace LMStreaming;
+namespace LMStreamer;
 
 public class StreamingService
 {
+    public int PacketsSent { get; private set; } = 0;
+
     public StreamingService(
         HandTrackingService handTrackingService,
         TcpServer tcpServer,
@@ -29,7 +31,8 @@ public class StreamingService
 
         _dispatcher.Invoke(() =>
         {
-            _tcpServer.Send(e.AsJson());
+            if (_tcpServer.Send(e.AsJson()))
+                PacketsSent++;
         });
     }
 }
