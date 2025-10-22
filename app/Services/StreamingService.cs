@@ -1,19 +1,22 @@
-﻿using System.Windows.Threading;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Windows.Threading;
 
 namespace LMStreamer;
 
-public class StreamingService
+public class StreamingService : IDisposable
 {
     public int PacketsSent { get; private set; } = 0;
 
-    public StreamingService(
-        HandTrackingService handTrackingService,
-        TcpServer tcpServer,
-        Dispatcher dispatcher)
+    public StreamingService(HandTrackingService handTrackingService)
     {
         _handTrackingService = handTrackingService;
-        _tcpServer = tcpServer;
-        _dispatcher = dispatcher;
+
+        // create UDP client and enable broadcast
+        _udpClient = new UdpClient();
+        _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+        _targetEndpoint = new IPEndPoint(IPAddress.Broadcast, 8982);
 
         handTrackingService.HandData += HandTrackingService_HandData;
     }
@@ -21,18 +24,36 @@ public class StreamingService
     // Internal
 
     readonly HandTrackingService _handTrackingService;
-    readonly TcpServer _tcpServer;
-    readonly Dispatcher _dispatcher;
+    
+    readonly UdpClient _udpClient;
+    readonly IPEndPoint _targetEndpoint;
 
     private void HandTrackingService_HandData(object? sender, HandLocation e)
     {
         if (!_handTrackingService.IsTracking)
             return;
 
-        _dispatcher.Invoke(() =>
+        var payload = e.AsJson();
+
+        try
         {
-            if (_tcpServer.Send(e.AsJson()))
-                PacketsSent++;
-        });
+            var bytes = Encoding.UTF8.GetBytes(payload);
+            _udpClient.Send(bytes, bytes.Length, _targetEndpoint);
+            PacketsSent++;
+        }
+        catch (SocketException)
+        {
+            // ignore send errors for now
+        }
+    }
+
+    public void Dispose()
+    {
+        _handTrackingService.HandData -= HandTrackingService_HandData;
+
+        _udpClient?.Close();
+        _udpClient?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

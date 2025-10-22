@@ -10,12 +10,13 @@ public partial class App : Application
 
     public App() : base()
     {
-        StreamingService = new StreamingService(HandTrackingService, TcpServer, Current.Dispatcher);
+        StreamingService = new StreamingService(HandTrackingService);
 
         Exit += (s, e) =>
         {
             HandTrackingService.Dispose();
             TcpServer.Dispose();
+            StreamingService.Dispose();
         };
     }
 }
